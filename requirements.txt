@@ -1,0 +1,4 @@
+python-telegram-bot
+selenium
+bs4
+lxml
