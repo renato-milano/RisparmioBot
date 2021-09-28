@@ -1,4 +1,7 @@
 python-telegram-bot
 selenium
+opencv-python
+numpy
+pyzbar
 bs4
 lxml
