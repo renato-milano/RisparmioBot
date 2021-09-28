@@ -136,6 +136,7 @@ def searchTrovaprezzi(update,context,result,driver):
 def searchProductIMG(update,context):
     opts = Options()
    # opts.headless=True
+    opts.binary_location = r'/vendor/firefox/firefox'
     context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
     driver = webdriver.Firefox(executable_path=r'./geckodriver',options=opts)
     file = context.bot.getFile(update.message.photo[-1].file_id)
