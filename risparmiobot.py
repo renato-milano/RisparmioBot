@@ -136,10 +136,10 @@ def searchTrovaprezzi(update,context,result,driver):
 def searchProductIMG(update,context):
     opts = Options()
    # opts.headless=True
-    
-    opts.binary_location = r'/usr/local/bin:/usr/bin:/bin:/app/vendor/firefox'
+    opts.binary_location='/app/vendor/firefox/firefox'
+
     context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
-    driver = webdriver.Firefox(executable_path=r'./geckodriver',options=opts)
+    driver = webdriver.Firefox(executable_path='/app/vendor/geckodriver/geckodriver',options=opts)
     file = context.bot.getFile(update.message.photo[-1].file_id)
     obj = context.bot.get_file(file)
     nomefile= randomword(6)
@@ -161,9 +161,10 @@ def searchProductText(update,context):
     if update.message.text.startswith('Cerca'):
         dati= update.message.text.split('erca ')
         opts = Options()
-        opts.headless=True
+        #opts.headless=True
+        opts.binary_location='/app/vendor/firefox/firefox'
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
-        driver = webdriver.Firefox(executable_path=r'./geckodriver',options=opts)
+        driver = webdriver.Firefox(executable_path='/app/vendor/geckodriver/geckodriver',options=opts)
         result=dati[1].replace(' ','%20')
         searchTrovaprezzi(update,context,result,driver)
         results = driver
