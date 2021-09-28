@@ -12,7 +12,7 @@ from telegram.ext import MessageHandler, Filters
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, element
 import io
 from PIL import Image
 
@@ -90,13 +90,52 @@ def search(update,context,result,driver):
             context.bot.send_message(chat_id=update.effective_chat.id, text='Come non detto... Prodotto riconosciuto ma non presente sui diversi comparatori di prezzo')
         driver.close()
         driver.quit()
+
+def searchTrovaprezzi(update,context,result,driver):
+    context.bot.send_message(chat_id=update.effective_chat.id, text='       PRODOTTO RICONOSCIUTO.\n\n      INIZIA LO SHOW ...      ')
+    driver.get('https://www.trovaprezzi.it/')
+    element = driver.find_element_by_id('libera')
+    element.send_keys(result)
+    driver.find_elements_by_class_name("search_button")[0].click()
+    time.sleep(1)
+    driver.get(driver.current_url+'?sort=prezzo_totale')
+    time.sleep(1)
+    
+    if len(driver.find_elements_by_class_name("listing_item"))>0:
+        element=driver.find_elements_by_class_name("listing_item")[0]
+        driver.execute_script("arguments[0].scrollIntoView();",element)
+        action = ActionChains(driver)
+        action.move_to_element(element)
+        action.click()
+        action.perform()
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
+        context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\n'+driver.current_url)
+        context.bot.send_message(chat_id=update.effective_chat.id, text='       RISULTATI IN ORDINE DI PREZZO       ')
+        elements=driver.find_elements_by_class_name("listing_item")
+        for elem in elements:
+            result=''
+            soup = BeautifulSoup(elem.get_attribute('innerHTML'), 'lxml')
+            result+='Nome: '+soup.find('a',class_='item_name').get_text().strip()+'\n'
+            result+='Prezzo: '+soup.find('div',class_='item_basic_price').get_text().strip()+'\n'
+            result+='Venduto da: '+soup.find('span',class_='merchant_name').get_text().strip()+'\n'
+            result+=soup.find('div',class_='item_delivery_price').get_text().strip().replace('+ Sped.','Spedizione:')+'\n'
+            result+=soup.find('div',class_='item_total_price').get_text().strip().replace('Tot.','\nTotale: ')+'\n'
+            #result+='Vedi: '+str(soup.find('a',class_='eaGTj').attrs.get('src'))+'\n'
+            #resultFinale+= elem.get_attribute('innerHTML')
+            #context.bot.send_photo(chat_id=update.effective_chat.id, photo=dir_path+'.png')
+            context.bot.send_message(chat_id=update.effective_chat.id, text=result)
+    else:
+        context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
+
+    driver.close()
+    driver.quit()       
     
 
 def searchProductIMG(update,context):
     opts = Options()
-    opts.set_headless()
+    opts.headless=True
     context.bot.send_message(chat_id=update.effective_chat.id, text='RICONOSCIMENTO PRODOTTO ...')
-    driver = webdriver.Firefox(executable_path=r'./geckodriver')
+    driver = webdriver.Firefox(executable_path=r'./geckodriver',options=opts)
     file = context.bot.getFile(update.message.photo[-1].file_id)
     obj = context.bot.get_file(file)
     nomefile= randomword(6)
@@ -108,7 +147,7 @@ def searchProductIMG(update,context):
     if(len(code)>0):
         result=str(code[0].data).replace('b\'','').replace('\'','')
         print(result)
-        search(update,context,result,driver)
+        searchTrovaprezzi(update,context,result,driver)
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
 
@@ -118,11 +157,11 @@ def searchProductText(update,context):
     if update.message.text.startswith('Cerca'):
         dati= update.message.text.split('erca ')
         opts = Options()
-        opts.set_headless()
-        context.bot.send_message(chat_id=update.effective_chat.id, text='RICONOSCIMENTO PRODOTTO ...')
-        driver = webdriver.Firefox(executable_path=r'./geckodriver')
+        opts.headless=True
+        context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
+        driver = webdriver.Firefox(executable_path=r'./geckodriver',options=opts)
         result=dati[1].replace(' ','%20')
-        search(update,context,result,driver)
+        searchTrovaprezzi(update,context,result,driver)
         results = driver
 
 
