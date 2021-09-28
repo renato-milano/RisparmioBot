@@ -13,8 +13,6 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 from bs4 import BeautifulSoup, element
-import io
-from PIL import Image
 from telegram import ParseMode
 
 updater = Updater(token=TOKEN, use_context=True)
