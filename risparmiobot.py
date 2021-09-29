@@ -143,8 +143,8 @@ def searchTrovaprezzi(update,context,result,driver):
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text='Come non detto... Prodotto riconosciuto ma non presente sui diversi comparatori di prezzo.\n')
 
-    #driver.close()
-    #driver.quit()       
+    driver.close()
+    driver.quit()       
     
 
 def searchProductIMG(update,context):
