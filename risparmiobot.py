@@ -110,7 +110,7 @@ def searchTrovaprezzi(update,context,result,driver):
     
     driver.get(driver.current_url+'?sort=prezzo_totale')
     time.sleep(40)
-    
+    print(driver.page_source)
     if len(driver.find_elements_by_class_name("listing_item"))>0:
         element=driver.find_elements_by_class_name("listing_item")[0]
         driver.execute_script("arguments[0].scrollIntoView();",element)
