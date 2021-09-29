@@ -37,6 +37,7 @@ def search(update,context,result,driver):
 
         context.bot.send_message(chat_id=update.effective_chat.id, text='PRODOTTO RICONOSCIUTO.\n\nCERCO ...')
         driver.get("https://www.google.com/search?tbm=shop&q="+result)
+        queue=result
         element= driver.find_elements_by_class_name("VfPpkd-Jh9lGc")[3]
         driver.execute_script("arguments[0].scrollIntoView();", element)
         action = ActionChains(driver)
@@ -45,9 +46,36 @@ def search(update,context,result,driver):
         action.click()
         action.perform()
         time.sleep(3)
+        tablefound=False
+        if len(driver.find_elements_by_class_name('sh-dlr__list-result'))>0:
+            element= driver.find_elements_by_class_name("sh-dlr__list-result")[0]
+            driver.execute_script("arguments[0].scrollIntoView();", element)
+            action = ActionChains(driver)
+            action.move_to_element(element)
+            time.sleep(3)
+            action.click()
+            action.perform()
+            driver.find_elements_by_class_name("CaGdPb")[0].click()
+            time.sleep(3)
+            tablefound=True
+        
+        if len(driver.find_elements_by_class_name('sh-dp__cont'))>0:
+            element= driver.find_elements_by_class_name("pspo-fade")[0]
+            driver.execute_script("arguments[0].scrollIntoView();", element)
+            action = ActionChains(driver)
+            action.move_to_element(element)
+            time.sleep(3)
+            action.click()
+            action.perform()
+            driver.find_element_by_class_name('_-n7').click()
+            time.sleep(3)
+            tablefound=True
+
         if len(driver.find_elements_by_class_name('iXEZD'))>0:
             #CONFRONTA PREZZI
             driver.find_element_by_class_name('iXEZD').click()
+            tablefound=True
+        if tablefound:
             time.sleep(1)
             driver.find_element_by_class_name('sh-osd__total-price').click()
             time.sleep(1)
@@ -56,38 +84,50 @@ def search(update,context,result,driver):
             title=driver.find_element_by_class_name('sh-t__title').get_attribute('innerHTML')
             context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&q='+result)
             context.bot.send_message(chat_id=update.effective_chat.id, text='RISULTATI IN ORDINE DI PREZZO')
-            for elem in elements:
+            
+            totalshowED = len(elements)
+            x=1
+            while(x!=totalshowED):
                 result=''
-                soup = BeautifulSoup(elem.get_attribute('innerHTML'), 'lxml')
-                result+='Nome: '+title+'\n'
-                result+='Prezzo: '+soup.find('span',class_='_-dN').get_text()+'\n'
-                result+='Venduto da: '+soup.find('a',class_='_-dQ').get_text().replace('Si apre in una nuova finestra','')+'\n'
-                result+=soup.find('td',class_='_-eE').get_text()+'\n'
-                result+='TOTALE: '+soup.find('div',class_='_-e5').get_text()+'\n'
+                result+='&#x1f4e6;Prodotto: '+title+'\n'
+                if 'sh-osd' in driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']').get_attribute("class"):
+                    seller=driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[1]/div[1]/a').text+'\n'
+                    result+='&#127970;Venduto da: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[1]/div[1]/a').text+'\n'
+                    result+='&#128666;'+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[2]').text+'\n'
+                    result+='&#128181;Prezzo Totale: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[4]').text+'\n'
+                    link=driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[5]/div/a').get_attribute("href")
+                    print(result)
+                    print(link)
+                    context.bot.send_message(chat_id=update.effective_chat.id, text=result,parse_mode=ParseMode.HTML)
+                    context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;",parse_mode=ParseMode.HTML)
                 
-                #result+='Vedi: '+str(soup.find('a',class_='eaGTj').attrs.get('src'))+'\n'
-                #resultFinale+= elem.get_attribute('innerHTML')context.bot.send_photo(chat_id=update.effective_chat.id, photo=dir_path+'.png')
-                context.bot.send_message(chat_id=update.effective_chat.id, text=result)
+                x=x+1 
 
         else:        
             elements= driver.find_elements_by_class_name("sh-dgr__content")
-            context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
-            context.bot.send_message(chat_id=update.effective_chat.id, text='https://www.google.com/search?tbm=shop&q='+result)
+            #context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
+            #context.bot.send_message(chat_id=update.effective_chat.id, text='https://www.google.com/search?tbm=shop&q='+queue)
             k=0
             im =''
             for elem in elements:
                 result=''
                 soup = BeautifulSoup(elem.get_attribute('innerHTML'), 'lxml')
-                result+='Nome: '+soup.find('h4',class_='Xjkr3b').get_text()+'\n'
-                result+='Prezzo: '+soup.find('span',class_='a8Pemb').get_text()+'\n'
-                result+='Venduto da: '+soup.find('div',class_='aULzUe').get_text()+'\n'
+                result+='&#x1f4e6;Nome: '+soup.find('h4',class_='Xjkr3b').get_text()+'\n'
+                result+='&#128181;Prezzo: '+soup.find('span',class_='a8Pemb').get_text()+'\n'
+                seller=soup.find('div',class_='aULzUe').get_text()
+                result+='&#127970;Venduto da: '+soup.find('div',class_='aULzUe').get_text()+'\n'
                 result+=soup.find('div',class_='vEjMR').get_text()+'\n'
                 #result+='Vedi: '+str(soup.find('a',class_='eaGTj').attrs.get('src'))+'\n'
                 #resultFinale+= elem.get_attribute('innerHTML')
                 #context.bot.send_photo(chat_id=update.effective_chat.id, photo=dir_path+'.png')
-                context.bot.send_message(chat_id=update.effective_chat.id, text=result)
+                image= soup.findAll('a')[2]
+                link=image['href']
+                context.bot.send_message(chat_id=update.effective_chat.id, text=result,parse_mode=ParseMode.HTML)
+                print(link)
+                context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+'https://www.google.com'+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;",parse_mode=ParseMode.HTML)
+
             
-        if len(elements)==0:
+        if not tablefound and driver.find_elements_by_class_name("sh-dgr__content")==0:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Come non detto... Prodotto riconosciuto ma non presente sui diversi comparatori di prezzo')
         driver.close()
         driver.quit()
@@ -159,18 +199,18 @@ def searchProductIMG(update,context):
         #opts.headless=True
         #opts.binary_location='/app/vendor/firefox/firefox'
         chrome_options = webdriver.ChromeOptions()
-        ua = UserAgent()
-        userAgent = ua.random
-        chrome_options.add_argument(f'user-agent={userAgent}')
-        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        chrome_options.add_argument("--disable-blink-features")
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("window-size=1400,800")
-        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+        
+        #chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+
+        #chrome_options.add_argument("--disable-blink-features")
+        #chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+        #chrome_options.add_argument("--headless")
+        #chrome_options.add_argument('--disable-gpu')
+        #chrome_options.add_argument("--disable-dev-shm-usage")
+        #chrome_options.add_argument("--no-sandbox")
+        #chrome_options.add_argument("window-size=1400,800")
+        driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
+        #driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
         #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
         file = context.bot.getFile(update.message.photo[-1].file_id)
@@ -184,14 +224,14 @@ def searchProductIMG(update,context):
         if(len(code)>0):
             result=str(code[0].data).replace('b\'','').replace('\'','')
             print(result)
-            searchTrovaprezzi(update,context,result,driver)
+            search(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
     except Exception as e:
         print('ERRORE PRESO!')
         print(traceback.format_exc())
-        driver.close()
-        driver.quit()    
+        #driver.close()
+        #driver.quit()    
     
 
 def searchProductText(update,context):
@@ -201,28 +241,27 @@ def searchProductText(update,context):
             #opts = Options()
             #opts.headless=True
             chrome_options = webdriver.ChromeOptions()
-            ua = UserAgent()
-            userAgent = ua.random
-            chrome_options.add_argument(f'user-agent={userAgent}')
-            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-            chrome_options.add_argument("--headless")
-            chrome_options.add_argument('--disable-gpu')
-            chrome_options.add_argument("--disable-blink-features")
-            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-            chrome_options.add_argument("--disable-dev-shm-usage")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("window-size=1400,800")
-            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+            
+            #chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            #chrome_options.add_argument("--headless")
+            #chrome_options.add_argument('--disable-gpu')
+            #chrome_options.add_argument("--disable-blink-features")
+            #chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+            #chrome_options.add_argument("--disable-dev-shm-usage")
+            #chrome_options.add_argument("--no-sandbox")
+            #chrome_options.add_argument("window-size=1400,800")
+            #driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+            driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
             context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
             #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
 
             #result=dati[1].replace(' ','%20')
-            searchTrovaprezzi(update,context,dati[1],driver)
+            search(update,context,dati[1],driver)
         except Exception as e:
             print('ERRORE PRESO!')
             print(traceback.format_exc())
-            driver.close()
-            driver.quit()
+            #driver.close()
+            #driver.quit()
 
 
 
