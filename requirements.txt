@@ -5,3 +5,4 @@ numpy
 pyzbar
 bs4
 lxml
+fake_useragent

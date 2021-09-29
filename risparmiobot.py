@@ -15,10 +15,7 @@ import time
 from bs4 import BeautifulSoup, element
 from telegram import ParseMode
 import traceback
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from fake_useragent import UserAgent
 
 updater = Updater(token=TOKEN, use_context=True)
 
@@ -98,12 +95,12 @@ def search(update,context,result,driver):
 def searchTrovaprezzi(update,context,result,driver):
     context.bot.send_message(chat_id=update.effective_chat.id, text='       PRODOTTO RICONOSCIUTO.      \n\n      INIZIA LO SHOW ...      ')
     driver.get('https://www.trovaprezzi.it/')
-    time.sleep(40)
+    time.sleep(20)
     #print(driver.page_source)
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
-    time.sleep(40)
+    time.sleep(20)
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
         driver.find_elements_by_class_name('relevant_item')[0].click()
     
@@ -160,8 +157,11 @@ def searchProductIMG(update,context):
         #opts.headless=True
         #opts.binary_location='/app/vendor/firefox/firefox'
         chrome_options = webdriver.ChromeOptions()
+        ua = UserAgent()
+        userAgent = ua.random
+        chrome_options.add_argument(f'user-agent={userAgent}')
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        chrome_options.add_argument("--headless")
+        #chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
         #chrome_options.add_argument("window-size=1400,800")
@@ -196,8 +196,12 @@ def searchProductText(update,context):
             #opts = Options()
             #opts.headless=True
             chrome_options = webdriver.ChromeOptions()
+            chrome_options = webdriver.ChromeOptions()
+            ua = UserAgent()
+            userAgent = ua.random
+            chrome_options.add_argument(f'user-agent={userAgent}')
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-            chrome_options.add_argument("--headless")
+            #chrome_options.add_argument("--headless")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
             #chrome_options.add_argument("window-size=1400,800")
