@@ -99,6 +99,7 @@ def searchTrovaprezzi(update,context,result,driver):
     #print(driver.page_source)
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
+    time.sleep(10)
     driver.find_elements_by_class_name("search_button")[0].click()
     time.sleep(5)
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
@@ -145,6 +146,7 @@ def searchTrovaprezzi(update,context,result,driver):
                 context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;",parse_mode=ParseMode.HTML)
                 x=x+1
     else:
+        context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
         context.bot.send_message(chat_id=update.effective_chat.id, text='Come non detto... Prodotto riconosciuto ma non presente sui diversi comparatori di prezzo.\n')
 
     driver.close()
