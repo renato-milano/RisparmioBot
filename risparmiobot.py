@@ -103,7 +103,7 @@ def searchTrovaprezzi(update,context,result,driver):
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
-    time.sleep(2)
+    time.sleep(40)
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
         driver.find_elements_by_class_name('relevant_item')[0].click()
     
