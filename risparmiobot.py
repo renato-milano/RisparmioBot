@@ -100,9 +100,9 @@ def searchTrovaprezzi(update,context,result,driver):
     driver.get('https://www.trovaprezzi.it/')
     time.sleep(1)
     try:
-        element = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, 'IdOfMyElement')))
+        element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, 'IdOfMyElement')))
     except TimeoutException:
-        print ("NUN SIM CAZZ RA TRUVA!!")
+        print ("NUN SIM CAZZ RA CARICA STA PAGIN!!")
     #element = driver.find_element_by_id('libera')
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
