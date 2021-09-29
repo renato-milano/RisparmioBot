@@ -159,7 +159,7 @@ def searchProductIMG(update,context):
         #opts = Options()
         #opts.headless=True
         #opts.binary_location='/app/vendor/firefox/firefox'
-        chrome_options = webdriver.Options()
+        chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         chrome_options.add_argument("--headless")
         #chrome_options.add_argument("--disable-dev-shm-usage")
@@ -195,7 +195,7 @@ def searchProductText(update,context):
             dati= update.message.text.split('erca ')
             #opts = Options()
             #opts.headless=True
-            chrome_options = webdriver.Options()
+            chrome_options = webdriver.ChromeOptions()
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
             chrome_options.add_argument("--headless")
             #chrome_options.add_argument("--disable-dev-shm-usage")
