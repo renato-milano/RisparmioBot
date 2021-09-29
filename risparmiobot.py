@@ -105,7 +105,7 @@ def searchTrovaprezzi(update,context,result,driver):
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
         driver.find_elements_by_class_name('relevant_item')[0].click()
     
-    
+    time.sleep(5)
     driver.get(driver.current_url+'?sort=prezzo_totale')
     time.sleep(5)
     print(driver.page_source)
@@ -163,11 +163,13 @@ def searchProductIMG(update,context):
         userAgent = ua.random
         chrome_options.add_argument(f'user-agent={userAgent}')
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--disable-blink-features")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--headless")
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
-        #chrome_options.add_argument("window-size=1400,800")
+        chrome_options.add_argument("window-size=1400,800")
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
         #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
@@ -205,10 +207,11 @@ def searchProductText(update,context):
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
             chrome_options.add_argument("--headless")
             chrome_options.add_argument('--disable-gpu')
-            
+            chrome_options.add_argument("--disable-blink-features")
+            chrome_options.add_argument("--disable-blink-features=AutomationControlled")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            #chrome_options.add_argument("window-size=1400,800")
+            chrome_options.add_argument("window-size=1400,800")
             driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
             context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
             #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
