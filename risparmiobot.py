@@ -98,12 +98,8 @@ def search(update,context,result,driver):
 def searchTrovaprezzi(update,context,result,driver):
     context.bot.send_message(chat_id=update.effective_chat.id, text='       PRODOTTO RICONOSCIUTO.      \n\n      INIZIA LO SHOW ...      ')
     driver.get('https://www.trovaprezzi.it/')
-    time.sleep(1)
-    try:
-        element = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, 'libera')))
-    except TimeoutException:
-        print ("NUN SIM CAZZ RA CARICA STA PAGIN!!")
-    #element = driver.find_element_by_id('libera')
+    time.sleep(60)
+    element = driver.find_element_by_id('libera')
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
     time.sleep(2)
