@@ -14,6 +14,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 import time
 from bs4 import BeautifulSoup, element
 from telegram import ParseMode
+import traceback
 
 updater = Updater(token=TOKEN, use_context=True)
 
@@ -149,40 +150,10 @@ def searchTrovaprezzi(update,context,result,driver):
     
 
 def searchProductIMG(update,context):
-    #opts = Options()
-   # opts.headless=True
-    #opts.binary_location='/app/vendor/firefox/firefox'
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("window-size=1400,800")
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-    context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
-    #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
-    file = context.bot.getFile(update.message.photo[-1].file_id)
-    obj = context.bot.get_file(file)
-    nomefile= randomword(6)
-    with open("foto/"+nomefile+".jpg", 'wb') as f:
-        context.bot.get_file(update.message.photo[-1]).download(out=f)
-    img = cv2.imread('foto/'+nomefile+'.jpg')
-    code= decode(img)
-    os.remove('foto/'+nomefile+'.jpg')
-    if(len(code)>0):
-        result=str(code[0].data).replace('b\'','').replace('\'','')
-        print(result)
-        searchTrovaprezzi(update,context,result,driver)
-    else:
-        context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
-
-    results = driver
-
-def searchProductText(update,context):
-    if update.message.text.startswith('Cerca'):
-        dati= update.message.text.split('erca ')
+    try:
         #opts = Options()
         #opts.headless=True
+        #opts.binary_location='/app/vendor/firefox/firefox'
         chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         chrome_options.add_argument("--headless")
@@ -192,10 +163,50 @@ def searchProductText(update,context):
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
         #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
+        file = context.bot.getFile(update.message.photo[-1].file_id)
+        obj = context.bot.get_file(file)
+        nomefile= randomword(6)
+        with open("foto/"+nomefile+".jpg", 'wb') as f:
+            context.bot.get_file(update.message.photo[-1]).download(out=f)
+        img = cv2.imread('foto/'+nomefile+'.jpg')
+        code= decode(img)
+        os.remove('foto/'+nomefile+'.jpg')
+        if(len(code)>0):
+            result=str(code[0].data).replace('b\'','').replace('\'','')
+            print(result)
+            searchTrovaprezzi(update,context,result,driver)
+        else:
+            context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
+    except Exception as e:
+        print('ERRORE PRESO!')
+        print(traceback.format_exc())
+        driver.close()
+        driver.quit()    
+    
 
-        #result=dati[1].replace(' ','%20')
-        searchTrovaprezzi(update,context,dati[1],driver)
-        results = driver
+def searchProductText(update,context):
+    if update.message.text.startswith('Cerca'):
+        try:
+            dati= update.message.text.split('erca ')
+            #opts = Options()
+            #opts.headless=True
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--disable-dev-shm-usage")
+            chrome_options.add_argument("--no-sandbox")
+            chrome_options.add_argument("window-size=1400,800")
+            driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+            context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
+            #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
+
+            #result=dati[1].replace(' ','%20')
+            searchTrovaprezzi(update,context,dati[1],driver)
+        except Exception as e:
+            print('ERRORE PRESO!')
+            print(traceback.format_exc())
+            driver.close()
+            driver.quit()
 
 
 
