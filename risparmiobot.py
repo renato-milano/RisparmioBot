@@ -9,7 +9,7 @@ from selenium import webdriver
 from telegram.ext import Updater
 from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 from bs4 import BeautifulSoup, element
@@ -97,6 +97,10 @@ def searchTrovaprezzi(update,context,result,driver):
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
     time.sleep(1)
+    if len(driver.find_elements_by_class_name('relevant_item'))>0:
+        driver.find_elements_by_class_name('relevant_item')[0].click()
+    
+    
     driver.get(driver.current_url+'?sort=prezzo_totale')
     time.sleep(1)
     
@@ -111,35 +115,50 @@ def searchTrovaprezzi(update,context,result,driver):
         #context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\n'+driver.current_url)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RISULTATI IN ORDINE DI PREZZO       ')
         elements=driver.find_elements_by_class_name("listing_item")
+        #context.bot.send_photo(chat_id=update.effective_chat.id, photo=image['src'])
+        x=0
         for elem in elements:
+            print(x)
+            if x==10:
+                break
             result=''
             soup = BeautifulSoup(elem.get_attribute('innerHTML'), 'lxml')
-            result+='Nome: '+soup.find('a',class_='item_name').get_text().strip()+'\n'
-            link= 'trovaprezzi.it'+soup.find('a', {'class': 'item_name'})['href']
-            result+='Prezzo: '+soup.find('div',class_='item_basic_price').get_text().strip()+'\n'
-            seller= soup.find('span',class_='merchant_name').get_text().strip()
-            result+='Venduto da: '+soup.find('span',class_='merchant_name').get_text().strip()+'\n'
-            result+=soup.find('div',class_='item_delivery_price').get_text().strip().replace('+ Sped.','Spedizione:')+'\n'
-            result+=soup.find('div',class_='item_total_price').get_text().strip().replace('Tot.','\nTotale: ')+'\n'
-            #result+='Vedi: '+str(soup.find('a',class_='eaGTj').attrs.get('src'))+'\n'
-            #resultFinale+= elem.get_attribute('innerHTML')
-            #context.bot.send_photo(chat_id=update.effective_chat.id, photo=dir_path+'.png')
-            context.bot.send_message(chat_id=update.effective_chat.id, text=result)
-            context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>",parse_mode=ParseMode.HTML)
+            if soup.find('span',class_='available')!=None:
+                result+='&#x1f4e6;Prodotto: '+soup.find('a',class_='item_name').get_text().strip()+'\n'
+                link= 'trovaprezzi.it'+soup.find('a', {'class': 'item_name'})['href']
+                result+='&#128181Prezzo: '+soup.find('div',class_='item_basic_price').get_text().strip()+'\n'
+                image= soup.findAll('img')[0]
+                context.bot.send_photo(chat_id=update.effective_chat.id, photo=image['src'])
+
+                seller= soup.find('span',class_='merchant_name').get_text().strip()
+                result+='&#127970;Venduto da: '+soup.find('span',class_='merchant_name').get_text().strip()+'\n'
+                result+=soup.find('div',class_='item_delivery_price').get_text().strip().replace('Sped.','&#128666;Spedizione:').replace('+ ','')+'\n'
+                result+=soup.find('div',class_='item_total_price').get_text().strip().replace('Tot.','\n&#128181Totale: ')+'\n'
+                #result+='Vedi: '+str(soup.find('a',class_='eaGTj').attrs.get('src'))+'\n'
+                #resultFinale+= elem.get_attribute('innerHTML')
+                #context.bot.send_photo(chat_id=update.effective_chat.id, photo=dir_path+'.png')
+                context.bot.send_message(chat_id=update.effective_chat.id, text=result,parse_mode=ParseMode.HTML)
+                context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;",parse_mode=ParseMode.HTML)
+                x=x+1
     else:
         context.bot.send_message(chat_id=update.effective_chat.id, text='Come non detto... Prodotto riconosciuto ma non presente sui diversi comparatori di prezzo.\n')
 
-    driver.close()
-    driver.quit()       
+    #driver.close()
+    #driver.quit()       
     
 
 def searchProductIMG(update,context):
-    opts = Options()
+    #opts = Options()
    # opts.headless=True
-    opts.binary_location='/app/vendor/firefox/firefox'
-
+    #opts.binary_location='/app/vendor/firefox/firefox'
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--no-sandbox")
+    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
     context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
-    driver = webdriver.Firefox(executable_path='/app/vendor/geckodriver/geckodriver',options=opts)
+    #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
     file = context.bot.getFile(update.message.photo[-1].file_id)
     obj = context.bot.get_file(file)
     nomefile= randomword(6)
@@ -160,13 +179,19 @@ def searchProductIMG(update,context):
 def searchProductText(update,context):
     if update.message.text.startswith('Cerca'):
         dati= update.message.text.split('erca ')
-        opts = Options()
+        #opts = Options()
         #opts.headless=True
-        opts.binary_location='/app/vendor/firefox/firefox'
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
-        driver = webdriver.Firefox(executable_path='/app/vendor/geckodriver/geckodriver',options=opts)
-        result=dati[1].replace(' ','%20')
-        searchTrovaprezzi(update,context,result,driver)
+        #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
+
+        #result=dati[1].replace(' ','%20')
+        searchTrovaprezzi(update,context,dati[1],driver)
         results = driver
 
 
