@@ -93,10 +93,11 @@ def search(update,context,result,driver):
 def searchTrovaprezzi(update,context,result,driver):
     context.bot.send_message(chat_id=update.effective_chat.id, text='       PRODOTTO RICONOSCIUTO.      \n\n      INIZIA LO SHOW ...      ')
     driver.get('https://www.trovaprezzi.it/')
+    time.sleep(1)
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
     driver.find_elements_by_class_name("search_button")[0].click()
-    time.sleep(1)
+    time.sleep(2)
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
         driver.find_elements_by_class_name('relevant_item')[0].click()
     
