@@ -98,8 +98,7 @@ def search(update,context,result,driver):
                     seller=driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[1]/div[1]/a').text+'\n'
                     result+='&#127970;Venduto da: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[1]/div[1]/a').text+'\n'
                     result+='&#128666;'+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[2]').text+'\n'
-                    result+='&#128181;Prezzo Articolo: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[3]').text+'\n'
-                    result+='&#128181;Prezzo Totale: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[4]').text+'\n'
+                    result+='&#128181;Prezzo Sped. Inclusa: '+driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[4]').text+'\n'
                     link=driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']/td[5]/div/a').get_attribute("href")
                     print(result)
                     print(link)
