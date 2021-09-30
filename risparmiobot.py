@@ -28,6 +28,26 @@ def randomword(length):
    letters = string.ascii_lowercase
    return ''.join(random.choice(letters) for i in range(length))
 
+def get_free_proxies(driver):
+    driver.get('https://sslproxies.org')
+
+    table = driver.find_element(By.TAG_NAME, 'table')
+    thead = table.find_element(By.TAG_NAME, 'thead').find_elements(By.TAG_NAME, 'th')
+    tbody = table.find_element(By.TAG_NAME, 'tbody').find_elements(By.TAG_NAME, 'tr')
+
+    headers = []
+    for th in thead:
+        headers.append(th.text.strip())
+
+    proxies = []
+    for tr in tbody:
+        proxy_data = {}
+        tds = tr.find_elements(By.TAG_NAME, 'td')
+        for i in range(len(headers)):
+            proxy_data[headers[i]] = tds[i].text.strip()
+        proxies.append(proxy_data)
+    
+    return proxies
 
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -223,7 +243,13 @@ def searchProductIMG(update,context):
         chrome_options = webdriver.ChromeOptions()
         
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-
+        proxies=get_free_proxies()
+        for i in range(0, len(proxies)):
+            try:
+                print("Proxy selected: {}".format(proxies[i]))
+            except:
+                print('boh')
+        chrome_options.add_argument('--proxy-server={}'.format(proxies[0]))
         chrome_options.add_argument("--disable-blink-features")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--headless")
