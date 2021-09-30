@@ -141,35 +141,26 @@ def searchTrovaprezzi(update,context,result,driver):
     driver.get('https://www.trovaprezzi.it/')
     time.sleep(5)
     if 'Ti viene richiesto di risolvere' in driver.page_source:
-        # find iframe
-        captcha_iframe = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, 'iframe')))
-        ActionChains(driver).move_to_element(captcha_iframe).click().perform()
-        # click im not robot
-        captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
-        driver.execute_script("arguments[0].click()", captcha_box)
-        print('cliccato Captcha riga 149!')
-        time.sleep(5)
+        print('BLOCCATO APPENA ENTRATO')
     
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
     time.sleep(10)
     driver.find_elements_by_class_name("search_button")[0].click()
     time.sleep(5)
+    if 'Ti viene richiesto di risolvere' in driver.page_source:
+        print('BLOCCATO DOPO CLICK CERCA')
     if len(driver.find_elements_by_class_name('relevant_item'))>0:
         driver.find_elements_by_class_name('relevant_item')[0].click()
-    
+    if 'Ti viene richiesto di risolvere' in driver.page_source:
+        print('BLOCCATO DOPO CLICK PRODOTTO')
     time.sleep(5)
-    driver.get(driver.current_url+'?sort=prezzo_totale')
+    #driver.get(driver.current_url+'?sort=prezzo_totale')
+    import requests
+    print(requests.get(driver.current_url+'?sort=prezzo_totale'))
     time.sleep(5)
     if 'Ti viene richiesto di risolvere' in driver.page_source:
-        # find iframe
-        captcha_iframe = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, 'iframe')))
-        ActionChains(driver).move_to_element(captcha_iframe).click().perform()
-        # click im not robot
-        captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
-        driver.execute_script("arguments[0].click()", captcha_box)
-        print('cliccato Captcha riga 169!')
-        time.sleep(5)
+        print('BLOCCATO DOPO CURL')
     
     print(driver.page_source)
     if len(driver.find_elements_by_class_name("listing_item"))>0:
@@ -254,14 +245,14 @@ def searchProductIMG(update,context):
                 "accuracy": 100
                 })
             driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
-            search(update,context,result,driver)
+            searchTrovaprezzi(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
     except Exception as e:
         print('ERRORE PRESO!')
         print(traceback.format_exc())
-        #driver.close()
-        #driver.quit()    
+        driver.close()
+        driver.quit()    
     
 
 def searchProductText(update,context):
@@ -292,12 +283,12 @@ def searchProductText(update,context):
                 })
             driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
             #result=dati[1].replace(' ','%20')
-            search(update,context,dati[1],driver)
+            searchTrovaprezzi(update,context,dati[1],driver)
         except Exception as e:
             print('ERRORE PRESO!')
             print(traceback.format_exc())
-            #driver.close()
-            #driver.quit()
+            driver.close()
+            driver.quit()
 
 
 
