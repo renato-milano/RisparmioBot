@@ -103,7 +103,7 @@ def search(update,context,result,driver):
                     print(result)
                     print(link)
                     context.bot.send_message(chat_id=update.effective_chat.id, text=result,parse_mode=ParseMode.HTML)
-                    context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;",parse_mode=ParseMode.HTML)
+                    context.bot.send_message(chat_id=update.message.chat_id, text="<a href='"+link+"'>Clicca per visualizzare l'offerta di "+seller+"  </a>&#9757;&#9757;&#9757;",parse_mode=ParseMode.HTML)
                 
                 x=x+1 
 
