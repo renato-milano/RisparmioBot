@@ -89,7 +89,7 @@ def search(update,context,result,driver):
             context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&gl=it&q='+queue)
             context.bot.send_message(chat_id=update.effective_chat.id, text='RISULTATI IN ORDINE DI PREZZO')
             
-            totalshowED = len(elements)
+            totalshowED = len(elements)+1
             x=1
             while(x!=totalshowED):
                 result=''
