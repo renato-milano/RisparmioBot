@@ -18,7 +18,8 @@ import time
 from bs4 import BeautifulSoup, element
 from telegram import ParseMode
 import traceback
-from fake_useragent import UserAgent
+from selenium.webdriver.chrome.service import Service
+
 
 updater = Updater(token=TOKEN, use_context=True)
 
@@ -85,7 +86,7 @@ def search(update,context,result,driver):
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
             elements= driver.find_elements_by_class_name("sh-osd__offer-row")
             title=driver.find_element_by_class_name('sh-t__title').get_attribute('innerHTML')
-            context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&q='+result)
+            context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&gl=it&q='+result)
             context.bot.send_message(chat_id=update.effective_chat.id, text='RISULTATI IN ORDINE DI PREZZO')
             
             totalshowED = len(elements)
@@ -247,6 +248,12 @@ def searchProductIMG(update,context):
         if(len(code)>0):
             result=str(code[0].data).replace('b\'','').replace('\'','')
             print(result)
+            Map_coordinates = dict({
+                "latitude": 40.71796565731356,
+                "longitude": 14.505847737967112,
+                "accuracy": 100
+                })
+            driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
             search(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
@@ -278,7 +285,12 @@ def searchProductText(update,context):
             #driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
             context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
             #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
-
+            Map_coordinates = dict({
+                "latitude": 40.71796565731356,
+                "longitude": 14.505847737967112,
+                "accuracy": 100
+                })
+            driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
             #result=dati[1].replace(' ','%20')
             search(update,context,dati[1],driver)
         except Exception as e:
