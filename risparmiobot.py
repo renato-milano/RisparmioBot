@@ -245,7 +245,7 @@ def searchProductIMG(update,context):
                 "accuracy": 100
                 })
             driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
-            searchTrovaprezzi(update,context,result,driver)
+            search(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
     except Exception as e:
@@ -283,7 +283,7 @@ def searchProductText(update,context):
                 })
             driver.execute_cdp_cmd("Emulation.setGeolocationOverride", Map_coordinates)
             #result=dati[1].replace(' ','%20')
-            searchTrovaprezzi(update,context,dati[1],driver)
+            search(update,context,dati[1],driver)
         except Exception as e:
             print('ERRORE PRESO!')
             print(traceback.format_exc())
