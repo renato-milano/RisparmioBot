@@ -223,7 +223,8 @@ def searchProductIMG(update,context):
         chrome_options = webdriver.ChromeOptions()
         
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-
+        prefs = {"profile.default_content_setting_values.geolocation" :2}
+        chrome_options.add_experimental_option("prefs",prefs)
         chrome_options.add_argument("--disable-blink-features")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--headless")
@@ -263,7 +264,8 @@ def searchProductText(update,context):
             #opts = Options()
             #opts.headless=True
             chrome_options = webdriver.ChromeOptions()
-            
+            prefs = {"profile.default_content_setting_values.geolocation" :2}
+            chrome_options.add_experimental_option("prefs",prefs)
             chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
             chrome_options.add_argument("--headless")
             chrome_options.add_argument('--disable-gpu')
