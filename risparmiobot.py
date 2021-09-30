@@ -41,7 +41,7 @@ def search(update,context,result,driver):
 
         context.bot.send_message(chat_id=update.effective_chat.id, text='PRODOTTO RICONOSCIUTO.\n\nCERCO ...')
         driver.get("https://www.google.it/search?tbm=shop&uule=w+CAIQICIGaXRhbGlh&gl=it&q="+result)
-        queue=result
+        queue=result.replace(' ','+')
         element= driver.find_elements_by_class_name("VfPpkd-Jh9lGc")[3]
         driver.execute_script("arguments[0].scrollIntoView();", element)
         action = ActionChains(driver)
@@ -81,12 +81,12 @@ def search(update,context,result,driver):
             tablefound=True
         if tablefound:
             time.sleep(1)
-            driver.find_element_by_class_name('sh-osd__total-price').click()
-            time.sleep(1)
+            driver.find_elements_by_class_name('sh-osd__sort-link')[1].click()
+            time.sleep(2.5)
             context.bot.send_photo(chat_id=update.effective_chat.id, photo=driver.get_screenshot_as_png())
             elements= driver.find_elements_by_class_name("sh-osd__offer-row")
             title=driver.find_element_by_class_name('sh-t__title').get_attribute('innerHTML')
-            context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&gl=it&q='+result)
+            context.bot.send_message(chat_id=update.effective_chat.id, text='LINK RISULTATO:\nhttps://www.google.com/search?tbm=shop&gl=it&q='+queue)
             context.bot.send_message(chat_id=update.effective_chat.id, text='RISULTATI IN ORDINE DI PREZZO')
             
             totalshowED = len(elements)
