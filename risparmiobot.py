@@ -40,7 +40,7 @@ def start(update, context):
 def search(update,context,result,driver):
 
         context.bot.send_message(chat_id=update.effective_chat.id, text='PRODOTTO RICONOSCIUTO.\n\nCERCO ...')
-        driver.get("https://www.google.it/search?tbm=shop&gl=it&q="+result)
+        driver.get("https://www.google.it/search?tbm=shop&uule=w+CAIQICIGaXRhbGlh&gl=it&q="+result)
         queue=result
         element= driver.find_elements_by_class_name("VfPpkd-Jh9lGc")[3]
         driver.execute_script("arguments[0].scrollIntoView();", element)
