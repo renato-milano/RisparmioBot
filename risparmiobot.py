@@ -36,7 +36,7 @@ def start(update, context):
 def search(update,context,result,driver):
 
         context.bot.send_message(chat_id=update.effective_chat.id, text='PRODOTTO RICONOSCIUTO.\n\nCERCO ...')
-        driver.get("https://www.google.com/search?tbm=shop&q="+result)
+        driver.get("https://www.google.it/search?tbm=shop&q="+result)
         queue=result
         element= driver.find_elements_by_class_name("VfPpkd-Jh9lGc")[3]
         driver.execute_script("arguments[0].scrollIntoView();", element)
@@ -200,7 +200,7 @@ def searchProductIMG(update,context):
         #opts.binary_location='/app/vendor/firefox/firefox'
         chrome_options = webdriver.ChromeOptions()
         
-        #chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
 
         chrome_options.add_argument("--disable-blink-features")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
