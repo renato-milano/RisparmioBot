@@ -243,13 +243,6 @@ def searchProductIMG(update,context):
         chrome_options = webdriver.ChromeOptions()
         
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        proxies=get_free_proxies()
-        for i in range(0, len(proxies)):
-            try:
-                print("Proxy selected: {}".format(proxies[i]))
-            except:
-                print('boh')
-        chrome_options.add_argument('--proxy-server={}'.format(proxies[0]))
         chrome_options.add_argument("--disable-blink-features")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--headless")
@@ -259,6 +252,17 @@ def searchProductIMG(update,context):
         #chrome_options.add_argument("window-size=1400,800")
         #driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+        proxies=get_free_proxies(driver)
+        driver.close()
+        driver.quit()
+        for i in range(0, len(proxies)):
+            try:
+                print("Proxy selected: {}".format(proxies[i]))
+            except:
+                print('boh')
+        chrome_options.add_argument('--proxy-server={}'.format(proxies[0]))
+        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
         #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
         file = context.bot.getFile(update.message.photo[-1].file_id)
