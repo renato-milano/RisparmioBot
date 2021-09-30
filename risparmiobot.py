@@ -91,7 +91,7 @@ def search(update,context,result,driver):
             
             totalshowED = len(elements)+1
             x=1
-            while(x!=totalshowED):
+            while(x!=totalshowED or x<11):
                 result=''
                 result+='&#x1f4e6;Prodotto: '+title+'\n'
                 if 'sh-osd' in driver.find_element_by_xpath('/html/body/div[4]/div[2]/div/div[3]/div/table/tbody/tr['+str(x)+']').get_attribute("class"):
