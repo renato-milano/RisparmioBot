@@ -11,6 +11,9 @@ from telegram.ext import CommandHandler
 from telegram.ext import MessageHandler, Filters
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait
 import time
 from bs4 import BeautifulSoup, element
 from telegram import ParseMode
@@ -136,7 +139,14 @@ def searchTrovaprezzi(update,context,result,driver):
     context.bot.send_message(chat_id=update.effective_chat.id, text='       PRODOTTO RICONOSCIUTO.      \n\n      INIZIA LO SHOW ...      ')
     driver.get('https://www.trovaprezzi.it/')
     time.sleep(5)
-    #print(driver.page_source)
+    if 'Ti viene richiesto di risolvere' in driver.page_source:
+        # find iframe
+        captcha_iframe = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, 'iframe')))
+        ActionChains(driver).move_to_element(captcha_iframe).click().perform()
+        # click im not robot
+        captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
+        driver.execute_script("arguments[0].click()", captcha_box)
+    
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
     time.sleep(10)
@@ -148,6 +158,14 @@ def searchTrovaprezzi(update,context,result,driver):
     time.sleep(5)
     driver.get(driver.current_url+'?sort=prezzo_totale')
     time.sleep(5)
+    if 'Ti viene richiesto di risolvere' in driver.page_source:
+        # find iframe
+        captcha_iframe = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, 'iframe')))
+        ActionChains(driver).move_to_element(captcha_iframe).click().perform()
+        # click im not robot
+        captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
+        driver.execute_script("arguments[0].click()", captcha_box)
+    
     print(driver.page_source)
     if len(driver.find_elements_by_class_name("listing_item"))>0:
         element=driver.find_elements_by_class_name("listing_item")[0]
@@ -208,7 +226,7 @@ def searchProductIMG(update,context):
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("window-size=1400,800")
+        #chrome_options.add_argument("window-size=1400,800")
         #driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
@@ -224,7 +242,7 @@ def searchProductIMG(update,context):
         if(len(code)>0):
             result=str(code[0].data).replace('b\'','').replace('\'','')
             print(result)
-            search(update,context,result,driver)
+            searchTrovaprezzi(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
     except Exception as e:
@@ -249,14 +267,14 @@ def searchProductText(update,context):
             chrome_options.add_argument("--disable-blink-features=AutomationControlled")
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("window-size=1400,800")
+            #chrome_options.add_argument("window-size=1400,800")
             driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
             #driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
             context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
             #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
 
             #result=dati[1].replace(' ','%20')
-            search(update,context,dati[1],driver)
+            searchTrovaprezzi(update,context,dati[1],driver)
         except Exception as e:
             print('ERRORE PRESO!')
             print(traceback.format_exc())
