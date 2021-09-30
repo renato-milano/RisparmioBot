@@ -28,26 +28,6 @@ def randomword(length):
    letters = string.ascii_lowercase
    return ''.join(random.choice(letters) for i in range(length))
 
-def get_free_proxies(driver):
-    driver.get('https://sslproxies.org')
-
-    table = driver.find_element(By.TAG_NAME, 'table')
-    thead = table.find_element(By.TAG_NAME, 'thead').find_elements(By.TAG_NAME, 'th')
-    tbody = table.find_element(By.TAG_NAME, 'tbody').find_elements(By.TAG_NAME, 'tr')
-
-    headers = []
-    for th in thead:
-        headers.append(th.text.strip())
-
-    proxies = []
-    for tr in tbody:
-        proxy_data = {}
-        tds = tr.find_elements(By.TAG_NAME, 'td')
-        for i in range(len(headers)):
-            proxy_data[headers[i]] = tds[i].text.strip()
-        proxies.append(proxy_data)
-    
-    return proxies
 
 import logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -243,6 +223,7 @@ def searchProductIMG(update,context):
         chrome_options = webdriver.ChromeOptions()
         
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+
         chrome_options.add_argument("--disable-blink-features")
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")
         chrome_options.add_argument("--headless")
@@ -252,17 +233,6 @@ def searchProductIMG(update,context):
         #chrome_options.add_argument("window-size=1400,800")
         #driver = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)
         driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-        proxies=get_free_proxies(driver)
-        driver.close()
-        driver.quit()
-        for i in range(0, len(proxies)):
-            try:
-                print("Proxy selected: {}".format(proxies[i]))
-            except:
-                print('boh')
-        chrome_options.add_argument('--proxy-server={}'.format(proxies[0]))
-        driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
-
         context.bot.send_message(chat_id=update.effective_chat.id, text='       RICONOSCIMENTO PRODOTTO ...     ')
         #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
         file = context.bot.getFile(update.message.photo[-1].file_id)
@@ -276,7 +246,7 @@ def searchProductIMG(update,context):
         if(len(code)>0):
             result=str(code[0].data).replace('b\'','').replace('\'','')
             print(result)
-            searchTrovaprezzi(update,context,result,driver)
+            search(update,context,result,driver)
         else:
             context.bot.send_message(chat_id=update.effective_chat.id, text='Non Trovato :( \n- Non è stato possibile reperire le informazioni\n- Inquadra meglio il codice a barre\nRiprova!')
     except Exception as e:
@@ -308,7 +278,7 @@ def searchProductText(update,context):
             #driver = webdriver.Chrome(executable_path='./chromedriver',options=opts)
 
             #result=dati[1].replace(' ','%20')
-            searchTrovaprezzi(update,context,dati[1],driver)
+            search(update,context,dati[1],driver)
         except Exception as e:
             print('ERRORE PRESO!')
             print(traceback.format_exc())
