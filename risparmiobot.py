@@ -146,6 +146,8 @@ def searchTrovaprezzi(update,context,result,driver):
         # click im not robot
         captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
         driver.execute_script("arguments[0].click()", captcha_box)
+        print('cliccato Captcha riga 149!')
+        time.sleep(5)
     
     element = driver.find_element_by_id('libera')
     element.send_keys(result)
@@ -165,6 +167,8 @@ def searchTrovaprezzi(update,context,result,driver):
         # click im not robot
         captcha_box = WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.ID, 'g-recaptcha-response')))
         driver.execute_script("arguments[0].click()", captcha_box)
+        print('cliccato Captcha riga 169!')
+        time.sleep(5)
     
     print(driver.page_source)
     if len(driver.find_elements_by_class_name("listing_item"))>0:
